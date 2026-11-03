@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { format as formatDate } from "date-fns";
 import { ChevronRight, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { SelfAssessmentBadge } from "@/components/hifz/assessment-status";
 import { StarMark } from "@/components/hifz/star-mark";
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/history/")({
   component: HistoryPage,
 });
 
-function ConfirmDelete({ title, body, onConfirm, trigger }: { title: string; body: string; onConfirm: () => void; trigger: React.ReactNode }) {
+function ConfirmDelete({ title, body, onConfirm, trigger }: { title: string; body: string; onConfirm: () => void; trigger: ReactNode }) {
   const t = useStrings();
   return (
     <AlertDialog>
