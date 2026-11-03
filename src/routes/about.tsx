@@ -25,7 +25,7 @@ export const Route = createFileRoute("/about")({
 function AboutPage() {
   const t = useStrings();
   const [before, after] = t.about.sourcesBody.split("{source}");
-  const [mid, end] = after.split("{edition}");
+  const [mid, end] = (after ?? "").split("{edition}");
   const sections = [
     { icon: Sparkles, title: t.about.aiTitle, body: <p>{t.about.aiBody}</p> },
     { icon: Lock, title: t.about.privacyTitle, body: <p>{t.about.privacyBody}</p> },

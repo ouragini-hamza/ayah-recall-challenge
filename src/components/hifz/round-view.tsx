@@ -22,7 +22,7 @@ interface RoundViewProps {
 export function RoundView({ session, onFinishSession }: RoundViewProps) {
   const t = useStrings();
   const { submitRound, rateRound, advance, markHintUsed } = useSession();
-  const round = session.rounds[session.currentIndex];
+  const round = session.rounds[session.currentIndex]!;
   const isLast = session.currentIndex === session.rounds.length - 1;
   const submitted = round.finishedAt !== null;
   const continuous = session.settings.mode === "continuous";
@@ -37,7 +37,7 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
     return () => window.clearInterval(id);
   }, [submitted]);
 
-  const first = round.ayahs[0];
+  const first = round.ayahs[0]!;
   const prompt = buildPromptExcerpt(first);
   const roundElapsed =
     round.startedAt && now ? (round.finishedAt ?? now) - round.startedAt : 0;

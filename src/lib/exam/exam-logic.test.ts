@@ -23,7 +23,7 @@ const base = { rounds: 5, ayahsPerRound: 5 };
 
 function seq(...values: number[]) {
   let i = 0;
-  return () => values[i++ % values.length];
+  return () => values[i++ % values.length] ?? 0;
 }
 
 describe("range validation", () => {
@@ -119,7 +119,7 @@ describe("random passage selection", () => {
     const passages = selectPassages(ayahs, { ayahsPerRound: 4, rounds: 3, avoidRepeats: true, rng: seq(0.5) });
     passages.forEach((p) => {
       expect(p).toHaveLength(4);
-      for (let i = 1; i < p.length; i++) expect(p[i].globalNumber).toBe(p[i - 1].globalNumber + 1);
+      for (let i = 1; i < p.length; i++) expect(p[i]!.globalNumber).toBe(p[i - 1]!.globalNumber + 1);
     });
   });
 });

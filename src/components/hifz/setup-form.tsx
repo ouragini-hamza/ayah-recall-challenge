@@ -174,7 +174,7 @@ export function SetupForm({ meta }: { meta: QuranMeta }) {
                         value={String(pos.surah)}
                         onValueChange={(v) => {
                           const surah = Number(v);
-                          const count = meta.surahs[surah - 1].ayahCount;
+                          const count = meta.surahs[surah - 1]?.ayahCount ?? 1;
                           update({ [which]: { surah, ayah: which === "start" ? 1 : count } });
                         }}
                       >

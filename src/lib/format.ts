@@ -25,9 +25,9 @@ export function describeRange(range: RangeSelection, meta: QuranMeta): string {
 }
 
 export function passageReference(ayahs: Ayah[]): string {
-  if (ayahs.length === 0) return "";
   const first = ayahs[0];
   const last = ayahs[ayahs.length - 1];
+  if (!first || !last) return "";
   if (first.surahNumber === last.surahNumber) {
     return first.ayahNumber === last.ayahNumber
       ? `${first.surahNameEnglish} ${first.key}`
@@ -38,5 +38,5 @@ export function passageReference(ayahs: Ayah[]): string {
 
 const arabicDigits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
 export function toArabicNumerals(n: number): string {
-  return String(n).replace(/\d/g, (d) => arabicDigits[Number(d)]);
+  return String(n).replace(/\d/g, (d) => arabicDigits[Number(d)] ?? d);
 }

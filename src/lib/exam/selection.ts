@@ -36,7 +36,7 @@ export function selectStartIndices({
   while (result.length < rounds) {
     if (pool.length === 0) pool = Array.from({ length: validCount }, (_, i) => i);
     const idx = pick(pool.length);
-    result.push(pool[idx]);
+    result.push(pool[idx] ?? 0);
     pool.splice(idx, 1);
   }
   return result;

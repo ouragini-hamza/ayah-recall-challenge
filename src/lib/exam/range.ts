@@ -24,7 +24,7 @@ export function totalAyahs(meta: QuranMeta): number {
 
 /** 1-based mushaf position of a verse. */
 export function toGlobal(pos: VersePosition, meta: QuranMeta): number {
-  return prefixCounts(meta)[pos.surah - 1] + pos.ayah;
+  return (prefixCounts(meta)[pos.surah - 1] ?? 0) + pos.ayah;
 }
 
 export function juzOfPosition(pos: VersePosition, meta: QuranMeta): number {
@@ -43,7 +43,9 @@ export function rangeBounds(
   if (range.kind === "surah") {
     return { startGlobal: toGlobal(range.start, meta), endGlobal: toGlobal(range.end, meta) };
   }
-  const startGlobal = toGlobal(meta.juzStarts[range.startJuz - 1], meta);
+  const first = meta.juzStarts[range.startJuz - 1];
+  if (!first) return { startGlobal: 1, endGlobal: 0 };
+  const startGlobal = toGlobal(first, meta);
   const next = meta.juzStarts[range.endJuz];
   const endGlobal = next ? toGlobal(next, meta) - 1 : totalAyahs(meta);
   return { startGlobal, endGlobal };
@@ -117,7 +119,7 @@ export function validateSettings(input: ValidationInput, meta: QuranMeta): Valid
     } else {
       for (const which of ["start", "end"] as const) {
         const pos = range[which];
-        const max = meta.surahs[pos.surah - 1].ayahCount;
+        const max = meta.surahs[pos.surah - 1]?.ayahCount ?? 0;
         if (!isInt(pos.ayah) || pos.ayah < 1 || pos.ayah > max) {
           issues.push({ code: "ayahOutOfBounds", which, max });
           rangeValid = false;
