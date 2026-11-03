@@ -39,7 +39,7 @@ function PracticePage() {
       <section className="animate-rise grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-end">
         <div>
           <p lang="ar" dir="rtl" className="font-arabic text-2xl text-gold md:text-start">
-            وَرَتِّلِ ٱلْقُرْءَانَ تَرْتِيلًا
+            {t.app.subtitleAr}
           </p>
           <h1 className="mt-2 font-display text-5xl font-semibold leading-[1.05] text-primary-deep sm:text-6xl">
             {t.setup.heroTitle}
