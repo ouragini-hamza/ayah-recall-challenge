@@ -21,23 +21,23 @@ export function SiteShell({ children }: { children: ReactNode }) {
         Skip to content
       </a>
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
+        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-2 px-3 sm:px-6">
           <Link to="/" className="group flex items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-            <StarMark className="size-8 text-gold transition-transform duration-500 group-hover:rotate-45" />
+            <StarMark className="size-7 shrink-0 text-gold sm:size-8 transition-transform duration-500 group-hover:rotate-45" />
             <span className="flex flex-col leading-none">
-              <span className="font-display text-xl font-semibold text-primary-deep">{t.app.name}</span>
+              <span className="whitespace-nowrap font-display text-lg font-semibold text-primary-deep sm:text-xl">{t.app.name}</span>
               <span lang="ar" dir="rtl" className="font-arabic text-sm text-muted-foreground">
                 {t.app.subtitleAr}
               </span>
             </span>
           </Link>
-          <nav aria-label="Main" className="flex items-center gap-1">
+          <nav aria-label="Main" className="flex items-center gap-0.5 sm:gap-1">
             {NAV.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
                 activeOptions={{ exact: item.to === "/" }}
-                className="rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[status=active]:bg-primary data-[status=active]:text-primary-foreground sm:px-4"
+                className="rounded-full px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[status=active]:bg-primary data-[status=active]:text-primary-foreground sm:px-4"
               >
                 {t.nav[item.key]}
               </Link>

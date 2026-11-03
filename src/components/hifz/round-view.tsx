@@ -78,7 +78,7 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
             {prompt.words}
             {prompt.truncated && <span className="text-gold"> …</span>}
           </p>
-          <p className="mt-6 text-sm text-primary-foreground/75">{t.exam.continueHint}</p>
+          <p className="mt-8 text-sm text-primary-foreground/75">{t.exam.continueHint}</p>
           {prompt.basmalahOmitted && (
             <p className="mt-1 text-xs text-primary-foreground/60">{t.exam.basmalahNote}</p>
           )}

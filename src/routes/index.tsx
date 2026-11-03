@@ -38,7 +38,7 @@ function PracticePage() {
     <div className="mx-auto max-w-5xl px-4 pb-16 pt-10 sm:px-6 sm:pt-14">
       <section className="animate-rise grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-end">
         <div>
-          <p lang="ar" dir="rtl" className="font-arabic text-2xl text-gold md:text-start">
+          <p lang="ar" className="font-arabic text-2xl text-gold">
             {t.app.subtitleAr}
           </p>
           <h1 className="mt-2 font-display text-5xl font-semibold leading-[1.05] text-primary-deep sm:text-6xl">
