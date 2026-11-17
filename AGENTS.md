@@ -16,3 +16,5 @@
 - UI copy lives in `src/lib/i18n/en.ts` (typed `UiStrings`); add locales with the same shape instead of hardcoding strings.
 - Active session state is in-memory React context (`src/lib/session/session-context.tsx`); history persists to localStorage without audio — recordings must never be persisted or uploaded.
 - Review text is rendered exactly as returned by the source; only the prompt excerpt may trim (first words, Basmalah prefix skipped).
+- Correction mapping lives in `src/lib/assessment/corrections.ts`: accept only provider-aligned evidence for the locked ayah keys and exact source text, revalidate spans before rendering, and fail ambiguous/invalid evidence to Needs review rather than invent judgments.
+- TajweedFormer remains a setup-only assessment adapter until the official licensed SDK and reliable phoneme-to-word alignment are verified; the source-span mapper is not a phoneme aligner and performs no inference.

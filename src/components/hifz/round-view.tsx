@@ -22,9 +22,9 @@ interface RoundViewProps {
 export function RoundView({ session, onFinishSession }: RoundViewProps) {
   const t = useStrings();
   const { submitRound, rateRound, advance, markHintUsed } = useSession();
-  const round = session.rounds[session.currentIndex]!;
+  const round = session.rounds[session.currentIndex];
   const isLast = session.currentIndex === session.rounds.length - 1;
-  const submitted = round.finishedAt !== null;
+  const submitted = round?.finishedAt != null;
   const continuous = session.settings.mode === "continuous";
   const recorder = useRecorder();
   const [submitting, setSubmitting] = useState(false);
@@ -37,7 +37,8 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
     return () => window.clearInterval(id);
   }, [submitted]);
 
-  const first = round.ayahs[0]!;
+  const first = round?.ayahs[0];
+  if (!round || !first) return null;
   const prompt = buildPromptExcerpt(first);
   const roundElapsed =
     round.startedAt && now ? (round.finishedAt ?? now) - round.startedAt : 0;
@@ -53,6 +54,12 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
         hadRecording: !!audio,
         assessment,
       });
+    } catch {
+      submitRound(round.index, {
+        recordingMs: continuous ? recorder.elapsedMs : 0,
+        hadRecording: !!recorder.audioUrl,
+        assessment: { status: "error", providerId: getAssessmentProvider().id, message: "Assessment failed" },
+      });
     } finally {
       setSubmitting(false);
     }
@@ -67,7 +74,7 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
   return (
     <div className="grid gap-6">
       {/* Prompt */}
-      <section
+      {!submitted && <section
         aria-label={t.exam.beginFrom}
         className="relative overflow-hidden rounded-3xl bg-hero px-6 py-10 text-center text-primary-foreground shadow-elevated sm:px-10 sm:py-14"
       >
@@ -103,7 +110,7 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
             )}
           </div>
         </div>
-      </section>
+      </section>}
 
       {!submitted && (
         <>
@@ -142,13 +149,19 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
               </h2>
               <span className="text-sm text-muted-foreground">{passageReference(round.ayahs)}</span>
             </div>
-            <PassageText ayahs={round.ayahs} className="mt-5" />
+            <PassageText ayahs={round.ayahs} corrections={round.assessment?.status === "completed" ? round.assessment.corrections : undefined} className="mt-5" />
             <div className="mt-5 flex flex-wrap items-center gap-3">
               <AssessmentStatus result={round.assessment} />
               <span className="text-xs text-muted-foreground">
                 {t.exam.roundTime}: {formatDuration(roundElapsed)}
               </span>
             </div>
+            {round.assessment?.status === "setup_needed" && (
+              <p className="mt-3 text-sm text-muted-foreground">
+                {t.correction.setup}{" "}
+                <a href="https://sdk.quranlab.ai/docs" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-4">{t.correction.sdkLink}</a>
+              </p>
+            )}
             {recorder.audioUrl && (
               <div className="mt-5 grid gap-2">
                 <p className="text-sm font-medium">{t.recorder.playback}</p>
@@ -166,14 +179,15 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
               {options.map((o) => {
                 const selected = round.selfAssessment === o.value;
                 return (
-                  <button
+                  <Button
                     key={o.value}
                     type="button"
+                    variant="outline"
                     role="radio"
                     aria-checked={selected}
                     onClick={() => rateRound(round.index, o.value)}
                     className={cn(
-                      "flex flex-col items-start gap-1 rounded-xl border p-4 text-start transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      "h-auto flex-col items-start gap-1 whitespace-normal rounded-xl border p-4 text-start transition-all",
                       selected ? cn(selfAssessmentTone[o.value], "shadow-soft") : "border-border hover:bg-muted",
                     )}
                   >
@@ -182,7 +196,7 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
                       {o.label}
                     </span>
                     <span className="text-xs opacity-80">{o.hint}</span>
-                  </button>
+                  </Button>
                 );
               })}
             </div>

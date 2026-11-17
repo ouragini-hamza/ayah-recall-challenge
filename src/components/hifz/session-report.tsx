@@ -84,7 +84,7 @@ export function SessionReport({ session }: { session: ExamSession }) {
                 </span>
               </AccordionTrigger>
               <AccordionContent className="pb-5">
-                <PassageText ayahs={r.ayahs} />
+                <PassageText ayahs={r.ayahs} corrections={r.assessment?.status === "completed" ? r.assessment.corrections : undefined} />
                 <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                   <AssessmentStatus result={r.assessment} />
                   {r.hadRecording && (

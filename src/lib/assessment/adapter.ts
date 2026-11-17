@@ -10,6 +10,7 @@
  * it from `getAssessmentProvider()`.
  */
 import type { Ayah } from "@/lib/quran/types";
+import type { PassageCorrections } from "./corrections";
 
 export interface WordMistake {
   ayahKey: string;
@@ -22,6 +23,7 @@ export interface WordMistake {
 export type AssessmentResult =
   | { status: "not_connected"; providerId: string }
   | { status: "no_recording"; providerId: string }
+  | { status: "setup_needed"; providerId: string }
   | {
       status: "completed";
       providerId: string;
@@ -29,6 +31,7 @@ export type AssessmentResult =
       mistakes: WordMistake[];
       /** 0..1 as reported by the provider; never computed locally. */
       accuracy?: number;
+      corrections?: PassageCorrections;
     }
   | { status: "error"; providerId: string; message: string };
 
@@ -56,5 +59,17 @@ export const notConnectedProvider: RecitationAssessmentProvider = {
 };
 
 export function getAssessmentProvider(): RecitationAssessmentProvider {
-  return notConnectedProvider;
+  return tajweedFormerSetupProvider;
 }
+
+/** Honest placeholder, NOT an SDK integration. No audio leaves this tab. */
+export const tajweedFormerSetupProvider: RecitationAssessmentProvider = {
+  id: "tajweedformer-v4",
+  label: "TajweedFormer V4 (setup required)",
+  isConfigured: false,
+  async assess({ audio }) {
+    return audio
+      ? { status: "setup_needed", providerId: "tajweedformer-v4" }
+      : { status: "no_recording", providerId: "tajweedformer-v4" };
+  },
+};

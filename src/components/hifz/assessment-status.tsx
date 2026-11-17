@@ -9,7 +9,7 @@ export function AssessmentStatus({ result }: { result: AssessmentResult | null }
   const t = useStrings();
   if (!result) return null;
   const Icon =
-    result.status === "not_connected"
+    result.status === "not_connected" || result.status === "setup_needed"
       ? CircleDashed
       : result.status === "no_recording"
         ? MicOff

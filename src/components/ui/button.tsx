@@ -16,6 +16,7 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        correction: "correction-trigger",
         hero: "bg-primary text-primary-foreground shadow-elevated ring-1 ring-gold/40 hover:bg-primary-deep hover:ring-gold/70",
         gold: "bg-gold-gradient text-gold-foreground shadow-soft hover:brightness-105",
         record:
@@ -28,6 +29,7 @@ const buttonVariants = cva(
         xl: "h-14 rounded-xl px-10 text-base",
         icon: "h-9 w-9",
         orb: "h-20 w-20 rounded-full [&_svg]:size-8",
+        inline: "correction-inline",
       },
     },
     defaultVariants: {
