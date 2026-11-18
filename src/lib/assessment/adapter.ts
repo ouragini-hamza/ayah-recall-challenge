@@ -1,16 +1,13 @@
 /**
  * Recitation assessment adapter.
  *
- * No Quran-aware speech recognition provider is connected in this MVP. The
- * default provider never transcribes or scores anything; it only reports that
- * assessment is unavailable so the UI can fall back to manual self-assessment.
- *
- * To integrate a real provider later, implement `RecitationAssessmentProvider`
- * (ideally calling it from a server function so keys stay private) and return
- * it from `getAssessmentProvider()`.
+ * Local SDK observations are not assessments. Only reliable aligned evidence
+ * may enter the completed correction contract. Manual self-assessment stays available.
  */
 import type { Ayah } from "@/lib/quran/types";
 import type { PassageCorrections } from "./corrections";
+import { hasQuranLabKey, QuranLabFailure, type QuranLabError } from "./quranlab";
+import { inferRecording, type RawObservation } from "./quranlab-inference";
 
 export interface WordMistake {
   ayahKey: string;
@@ -24,6 +21,7 @@ export type AssessmentResult =
   | { status: "not_connected"; providerId: string }
   | { status: "no_recording"; providerId: string }
   | { status: "setup_needed"; providerId: string }
+  | { status: "observed"; providerId: string; observation: RawObservation }
   | {
       status: "completed";
       providerId: string;
@@ -33,11 +31,12 @@ export type AssessmentResult =
       accuracy?: number;
       corrections?: PassageCorrections;
     }
-  | { status: "error"; providerId: string; message: string };
+  | { status: "error"; providerId: string; message: string; reason?: QuranLabError };
 
 export interface AssessmentInput {
   audio: Blob | null;
   expected: Ayah[];
+  signal?: AbortSignal;
 }
 
 export interface RecitationAssessmentProvider {
@@ -59,17 +58,22 @@ export const notConnectedProvider: RecitationAssessmentProvider = {
 };
 
 export function getAssessmentProvider(): RecitationAssessmentProvider {
-  return tajweedFormerSetupProvider;
+  return tajweedFormerProvider;
 }
 
-/** Honest placeholder, NOT an SDK integration. No audio leaves this tab. */
-export const tajweedFormerSetupProvider: RecitationAssessmentProvider = {
+/** Real SDK inference; intentionally does not populate the completed correction contract. */
+export const tajweedFormerProvider: RecitationAssessmentProvider = {
   id: "tajweedformer-v4",
-  label: "TajweedFormer V4 (setup required)",
-  isConfigured: false,
-  async assess({ audio }) {
-    return audio
-      ? { status: "setup_needed", providerId: "tajweedformer-v4" }
-      : { status: "no_recording", providerId: "tajweedformer-v4" };
+  label: "TajweedFormer V4",
+  get isConfigured() { return hasQuranLabKey(); },
+  async assess({ audio, signal }) {
+    const providerId = "tajweedformer-v4";
+    if (!audio) return { status: "no_recording", providerId };
+    if (!hasQuranLabKey()) return { status: "setup_needed", providerId };
+    try { return { status: "observed", providerId, observation: await inferRecording(audio, signal) }; }
+    catch (error) {
+      const reason = error instanceof QuranLabFailure ? error.reason : "inference";
+      return { status: "error", providerId, message: reason, reason };
+    }
   },
 };

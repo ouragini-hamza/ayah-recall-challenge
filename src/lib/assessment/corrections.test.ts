@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { Ayah } from "@/lib/quran/types";
 import { getAssessmentProvider } from "./adapter";
 import { mapAlignedCorrections, sourceWords, validateCorrections, type AlignedAyahEvidence } from "./corrections";
@@ -58,8 +58,10 @@ describe("Source-anchored corrections", () => {
     expect(validateCorrections([ayah], report).ayahs[0]?.issues[0]?.sourceSpan.text).toBe("طَالِبٌ");
   });
   it("reports setup needed without fabricated analysis or audio uploads", async () => {
+    vi.stubEnv("VITE_QURANLAB_KEY", "");
     expect(getAssessmentProvider().isConfigured).toBe(false);
     expect(await getAssessmentProvider().assess({ audio: new Blob(["test"]), expected: [ayah] })).toEqual({ status: "setup_needed", providerId: "tajweedformer-v4" });
     expect((await getAssessmentProvider().assess({ audio: null, expected: [ayah] })).status).toBe("no_recording");
+    vi.unstubAllEnvs();
   });
 });

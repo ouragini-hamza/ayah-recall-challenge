@@ -1,4 +1,4 @@
-import { CircleCheck, CircleDashed, MicOff, TriangleAlert } from "lucide-react";
+import { CircleCheck, CircleDashed, MicOff, TriangleAlert, AudioLines } from "lucide-react";
 
 import type { AssessmentResult } from "@/lib/assessment/adapter";
 import { format, useStrings } from "@/lib/i18n";
@@ -9,7 +9,7 @@ export function AssessmentStatus({ result }: { result: AssessmentResult | null }
   const t = useStrings();
   if (!result) return null;
   const Icon =
-    result.status === "not_connected" || result.status === "setup_needed"
+    result.status === "observed" ? AudioLines : result.status === "not_connected" || result.status === "setup_needed"
       ? CircleDashed
       : result.status === "no_recording"
         ? MicOff

@@ -28,7 +28,11 @@ function write(sessions: ExamSession[]) {
 
 export function saveSessionToHistory(session: ExamSession) {
   const rest = loadHistory().filter((s) => s.id !== session.id);
-  write([session, ...rest]);
+  // Raw observations live only in the active session; history retains no audio-derived arrays.
+  const saved: ExamSession = { ...session, rounds: session.rounds.map((round) => ({
+    ...round, assessment: round.assessment?.status === "observed" ? null : round.assessment,
+  })) };
+  write([saved, ...rest]);
 }
 
 export function getSessionFromHistory(id: string): ExamSession | undefined {

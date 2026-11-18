@@ -1,5 +1,5 @@
 import { ArrowRight, CheckCircle2, Eye, Flag, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { useRecorder } from "@/hooks/use-recorder";
@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 import { PassageText } from "./ayah-text";
 import { AssessmentStatus, selfAssessmentTone } from "./assessment-status";
 import { RecorderPanel } from "./recorder-panel";
+import { QuranLabStatus } from "./quranlab-status";
+import { ModelObservations } from "./model-observations";
 
 interface RoundViewProps {
   session: ExamSession;
@@ -29,6 +31,8 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
   const recorder = useRecorder();
   const [submitting, setSubmitting] = useState(false);
   const [now, setNow] = useState<number | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  useEffect(() => () => { abortRef.current?.abort(); }, []);
 
   useEffect(() => {
     setNow(Date.now());
@@ -44,11 +48,14 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
     round.startedAt && now ? (round.finishedAt ?? now) - round.startedAt : 0;
 
   const finish = async () => {
+    if (submitting) return;
+    const controller = new AbortController();
+    abortRef.current = controller;
     setSubmitting(true);
     try {
       const audio = continuous ? await recorder.stop() : null;
       const provider = getAssessmentProvider();
-      const assessment = await provider.assess({ audio, expected: round.ayahs });
+      const assessment = await provider.assess({ audio, expected: round.ayahs, signal: controller.signal });
       submitRound(round.index, {
         recordingMs: continuous ? recorder.elapsedMs : 0,
         hadRecording: !!audio,
@@ -115,7 +122,7 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
       {!submitted && (
         <>
           {continuous ? (
-            <RecorderPanel recorder={recorder} locked={submitting} />
+            <><RecorderPanel recorder={recorder} locked={submitting} /><QuranLabStatus /></>
           ) : (
             <div className="rounded-2xl border border-border bg-card p-5 text-sm text-muted-foreground shadow-soft">
               {t.setup.modePromptOnlyHint}
@@ -137,6 +144,7 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
               {t.exam.finishRound}
             </Button>
           </div>
+          {submitting && <div className="grid gap-2"><p role="status" className="text-sm text-muted-foreground">{t.quranlab.processing}</p><Button variant="ghost" className="w-fit" onClick={() => abortRef.current?.abort()}>{t.quranlab.cancel}</Button></div>}
         </>
       )}
 
@@ -156,12 +164,9 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
                 {t.exam.roundTime}: {formatDuration(roundElapsed)}
               </span>
             </div>
-            {round.assessment?.status === "setup_needed" && (
-              <p className="mt-3 text-sm text-muted-foreground">
-                {t.correction.setup}{" "}
-                <a href="https://sdk.quranlab.ai/docs" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-4">{t.correction.sdkLink}</a>
-              </p>
-            )}
+            {round.assessment?.status === "setup_needed" && <div className="mt-3"><QuranLabStatus reason="missing_key" /></div>}
+            {round.assessment?.status === "error" && <div className="mt-3"><QuranLabStatus reason={round.assessment.reason ?? "inference"} /></div>}
+            {round.assessment?.status === "observed" && <ModelObservations observation={round.assessment.observation} />}
             {recorder.audioUrl && (
               <div className="mt-5 grid gap-2">
                 <p className="text-sm font-medium">{t.recorder.playback}</p>

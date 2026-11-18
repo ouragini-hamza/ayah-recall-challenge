@@ -17,4 +17,6 @@
 - Active session state is in-memory React context (`src/lib/session/session-context.tsx`); history persists to localStorage without audio — recordings must never be persisted or uploaded.
 - Review text is rendered exactly as returned by the source; only the prompt excerpt may trim (first words, Basmalah prefix skipped).
 - Correction mapping lives in `src/lib/assessment/corrections.ts`: accept only provider-aligned evidence for the locked ayah keys and exact source text, revalidate spans before rendering, and fail ambiguous/invalid evidence to Needs review rather than invent judgments.
-- TajweedFormer remains a setup-only assessment adapter until the official licensed SDK and reliable phoneme-to-word alignment are verified; the source-span mapper is not a phoneme aligner and performs no inference.
+- The official SDK is dynamically imported from browser user actions through the singleton loader in `quranlab.ts`; disable analytics and sharing before takes to preserve audio privacy.
+- Post-round inference uses documented `model.listen({ from: monoSamples, sampleRate, pace: 'fast' })` on the existing recording, without silence truncation or a second microphone; cancel on hidden pages/unmounts and retain playback only in memory.
+- SDK phonetic observations are separate from validated corrections and excluded from local history; no scorer or phoneme-to-word alignment is implemented, and runtime calibration is shown as data rather than applied as judgments.

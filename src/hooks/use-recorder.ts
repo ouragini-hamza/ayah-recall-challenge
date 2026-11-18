@@ -37,6 +37,7 @@ export function useRecorder() {
   const segmentStartRef = useRef<number | null>(null);
   const stopResolverRef = useRef<((b: Blob | null) => void) | null>(null);
   const urlRef = useRef<string | null>(null);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
     setSupported(isRecordingSupported());
@@ -81,7 +82,10 @@ export function useRecorder() {
     setStatus("idle");
   }, [clearUrl, releaseStream]);
 
-  useEffect(() => () => reset(), [reset]);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; reset(); };
+  }, [reset]);
 
   const start = useCallback(async () => {
     if (!isRecordingSupported()) {
@@ -94,6 +98,7 @@ export function useRecorder() {
     setStatus("requesting");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!mountedRef.current || document.hidden) { stream.getTracks().forEach((track) => track.stop()); setStatus("idle"); return; }
       streamRef.current = stream;
       const mimeType = MIME_CANDIDATES.find((m) => MediaRecorder.isTypeSupported?.(m));
       const rec = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
@@ -165,6 +170,12 @@ export function useRecorder() {
       rec.stop();
     });
   }, []);
+
+  useEffect(() => {
+    const hide = () => { if (document.hidden) void stop(); };
+    document.addEventListener("visibilitychange", hide);
+    return () => document.removeEventListener("visibilitychange", hide);
+  }, [stop]);
 
   return {
     status,
