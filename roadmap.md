@@ -1,4 +1,8 @@
 # Correction experience
+- [ ] Complete official Quran Lab setup Flow: blocked at Step 1 because no stored assistant sign-in or securely configured setup token exists; never reuse credentials exposed in chat.
+- [ ] Resolve official SDK 4.0 migration before implementation: requires user approval for always-on anonymous analytics and learner-controlled sharing versus the app's no-upload privacy rule; do not change SDK version or privacy behavior meanwhile.
+- [ ] Run authenticated GET /v1/setup and GET /v1/setup/check, official sample-clip inference and client.diagnose(); blocked by sign-in and migration decision, not verified.
+- [ ] Resolve existing verification failures: correction fixture expects offsets 9–16 but source word is at 8–15; lint currently reports formatting errors. Production build has not been verified in this pass.
 - [ ] Integrate official browser SDK loader and real post-recording inference; keep unaligned observations separate from corrections.
 - [ ] Add SDK setup/loading/error/privacy UX and runtime reference/calibration availability.
 - [ ] Test loader/inference lifecycle and verify existing recording, review, history, and mobile layout.
