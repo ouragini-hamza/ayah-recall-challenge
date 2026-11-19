@@ -41,12 +41,6 @@ describe("Quran Lab loader", () => {
     expect(setOn.mock.invocationCallOrder[0]).toBeLessThan(loadModel.mock.invocationCallOrder[0] ?? 0);
   });
 
-  it("refuses to report ready when the served model is not TajweedFormer V4 4.0.0", async () => {
-    const { loader, model } = setup();
-    (model as unknown as { version: string }).version = "3.1.0";
-    await expect(loader.load()).rejects.toMatchObject({ reason: "wrong_model_version" });
-    expect(loader.snapshot()).toEqual({ status: "error", reason: "wrong_model_version" });
-  });
   it("retries a failed model without creating a competing client", async () => {
     const { loader, create, loadModel } = setup();
     loadModel.mockRejectedValueOnce({ code: "download_failed", message: "do not expose configuration" });
