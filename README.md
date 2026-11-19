@@ -77,7 +77,7 @@ npm run dev
 
 ## Quran Lab — TajweedFormer V4
 
-The browser app uses the official `@quran-lab/tajweedformer` web SDK and verifies that the model actually served at runtime reports version `4.0.0`. The current `3.1.6` SDK can receive V4; Quran Lab says SDK 3.x stops receiving V4 on 15 January 2027, so plan the SDK 4.0 migration before that date.
+The browser app uses the official `@quran-lab/tajweedformer` web SDK. Quran Lab confirms that the current 3.x SDK can receive the V4 model until 15 January 2027, when SDK 3.x stops receiving V4. The app displays the exact model version returned at runtime; do not infer the model version from the npm SDK version.
 
 ### Configure the web key
 
@@ -86,7 +86,7 @@ The browser app uses the official `@quran-lab/tajweedformer` web SDK and verifie
 3. For local development, copy `.env.example` to `.env.local` and set `VITE_QURANLAB_KEY`. The `.local` file is git-ignored. In hosted builds, add the same variable in the hosting platform's environment/secrets settings. Never commit a real key.
 4. Open the app over HTTPS, choose a recorded round, and use **Prepare local model**. The first use downloads/opens the model on the learner's device; subsequent use can use the verified browser cache.
 
-The web key is public by design and restricted by exact origin. Do not use a desktop key in the browser.
+The web key is public by design and restricted by exact origin. Do not use a desktop key in the browser. For this SDK 3.x integration, anonymous analytics and sharing are disabled in the app configuration.
 
 ### What the current assessment does
 
