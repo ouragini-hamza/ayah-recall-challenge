@@ -73,3 +73,23 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+
+## Quran Lab — TajweedFormer V4
+
+The browser app uses the official `@quran-lab/tajweedformer` web SDK and verifies that the model actually served at runtime reports version `4.0.0`. The current `3.1.6` SDK can receive V4; Quran Lab says SDK 3.x stops receiving V4 on 15 January 2027, so plan the SDK 4.0 migration before that date.
+
+### Configure the web key
+
+1. Sign in at [Quran Lab SDK](https://sdk.quranlab.ai/) with the Hugging Face account that has accepted the model licence.
+2. Create/copy a **web key** for this app and allow the exact HTTPS origin(s) where it runs. The current Lovable preview origin is `https://id-preview--47d80bc1-c194-45c7-a007-86787d0e2efc.lovable.app`; add the production origin too if one is configured.
+3. For local development, copy `.env.example` to `.env.local` and set `VITE_QURANLAB_KEY`. The `.local` file is git-ignored. In hosted builds, add the same variable in the hosting platform's environment/secrets settings. Never commit a real key.
+4. Open the app over HTTPS, choose a recorded round, and use **Prepare local model**. The first use downloads/opens the model on the learner's device; subsequent use can use the verified browser cache.
+
+The web key is public by design and restricted by exact origin. Do not use a desktop key in the browser.
+
+### What the current assessment does
+
+The SDK returns phonetic tokens, timing, confidence and raw tajweed heads. It does **not** compare the learner's audio with the selected ayahs or issue mistake judgments. This app currently displays those observations for inspection and keeps self-assessment available; word-level omissions, substitutions, repetitions and tajweed verdicts require a separately validated reference-alignment/scoring layer. Never present raw model observations as confirmed mistakes or religious rulings.
+
+Automatic tajweed feedback can be wrong and does not replace a qualified teacher. Audio is processed locally; the app explicitly keeps SDK sharing disabled in its current SDK 3.x integration.
