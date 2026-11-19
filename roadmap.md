@@ -1,7 +1,7 @@
 # Correction experience
-- [ ] Complete official Quran Lab setup Flow: blocked at Step 1 because no stored assistant sign-in or securely configured setup token exists; never reuse credentials exposed in chat.
-- [ ] Resolve official SDK 4.0 migration before implementation: requires user approval for always-on anonymous analytics and learner-controlled sharing versus the app's no-upload privacy rule; do not change SDK version or privacy behavior meanwhile.
-- [ ] Run authenticated GET /v1/setup and GET /v1/setup/check, official sample-clip inference and client.diagnose(); blocked by sign-in and migration decision, not verified.
+- [x] Complete official Step 1 sign-in using the uploaded setup prompt; assistant authorization saved outside the project with owner-only access. GET /v1/setup confirms a personal workspace with no organisations; no key was copied into project configuration.
+- [x] User approved SDK 4.0 migration, always-on anonymous analytics and learner-controlled recording sharing; implement only the SDK's official consent behavior.
+- [ ] Complete official setup/check conclusion, sample-clip inference and client.diagnose(): read-only GET /v1/setup/check?mark=0 returned verified=false, registered=false, declaration=false and no apps. Remaining steps await the privacy/migration decision; no launch or audio correction has been verified.
 - [ ] Resolve existing verification failures: correction fixture expects offsets 9–16 but source word is at 8–15; lint currently reports formatting errors. Production build has not been verified in this pass.
 - [ ] Integrate official browser SDK loader and real post-recording inference; keep unaligned observations separate from corrections.
 - [ ] Add SDK setup/loading/error/privacy UX and runtime reference/calibration availability.
