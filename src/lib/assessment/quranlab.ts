@@ -1,8 +1,6 @@
 import type { TajweedClient, TajweedModel } from "@quran-lab/tajweedformer";
 
-export const TAJWEEDFORMER_V4_VERSION = "4.0.0";
-
-export type QuranLabError = "missing_key" | "origin_denied" | "offline" | "unsupported" | "download" | "storage" | "interrupted" | "inference" | "wrong_model_version";
+export type QuranLabError = "missing_key" | "origin_denied" | "offline" | "unsupported" | "download" | "storage" | "interrupted" | "inference";
 export type QuranLabState =
   | { status: "idle" }
   | { status: "loading"; cached: boolean | null }
@@ -52,10 +50,6 @@ export function createQuranLabLoader(options: LoaderOptions) {
       const cached = storage.models.length > 0;
       update({ status: "loading", cached });
       model = await client.model();
-      if (model.version !== TAJWEEDFORMER_V4_VERSION) {
-        model = null;
-        throw new QuranLabFailure("wrong_model_version");
-      }
       update({ status: "ready", cached, version: model.version, reference: model.reference !== null, calibration: model.calibration !== null });
       return model;
     } catch (error) {
