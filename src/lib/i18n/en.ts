@@ -176,6 +176,7 @@ export const en = {
       storage: "Browser storage is unavailable or full. Allow site storage or free space, then retry.",
       interrupted: "Local analysis was interrupted. Review the recording and assess yourself.",
       inference: "Local analysis could not finish. Your recording and manual assessment are still available.",
+      wrong_model_version: "Quran Lab did not serve TajweedFormer V4 (4.0.0). Check the app version/channel in your Quran Lab portal and retry.",
     },
   },
   results: {
