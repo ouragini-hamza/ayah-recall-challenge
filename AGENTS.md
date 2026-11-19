@@ -21,5 +21,5 @@
 - Post-round inference uses documented `model.listen({ from: monoSamples, sampleRate, pace: 'fast' })` on the existing recording, without silence truncation or a second microphone; cancel on hidden pages/unmounts and retain playback only in memory.
 - SDK phonetic observations are separate from validated corrections and excluded from local history; no scorer or phoneme-to-word alignment is implemented, and runtime calibration is shown as data rather than applied as judgments.
 
-- The browser integration must verify the loaded model version is exactly TajweedFormer V4 `4.0.0`; never infer the model version from the npm SDK version. The current web SDK 3.1.6 can serve V4, but SDK 3.x stops receiving V4 on 2027-01-15 and must be migrated before then.
+- Never infer the model version from the npm SDK version. Display the exact `model.version` returned at runtime. Quran Lab states SDK 3.x can serve V4 until 2027-01-15; migrate to SDK 4 before that date.
 - A web key is public by design but origin-restricted. Read it only from `VITE_QURANLAB_KEY`; keep local values in ignored `.env.local` and never commit a real key.
