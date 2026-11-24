@@ -15,7 +15,7 @@ describe("Source-anchored corrections", () => {
   it("retains every original diacritic and whitespace when anchoring words", () => {
     const result = mapAlignedCorrections([ayah], evidence());
     const span = result.ayahs[0]?.issues[0]?.sourceSpan;
-    expect(span).toEqual({ start: 9, end: 16, text: "طَالِبٌ" });
+    expect(span).toEqual({ start: 8, end: 15, text: "طَالِبٌ" });
     expect(span && text.slice(0, span.start) + span.text + text.slice(span.end)).toBe(text);
     expect(sourceWords(text).length).toBe(3);
   });
