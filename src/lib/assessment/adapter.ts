@@ -4,10 +4,13 @@
  * Local SDK observations are not assessments. Only reliable aligned evidence
  * may enter the completed correction contract. Manual self-assessment stays available.
  */
+import { buildPromptExcerpt } from "@/lib/exam/selection";
 import type { Ayah } from "@/lib/quran/types";
-import type { PassageCorrections } from "./corrections";
+import { mapAlignedCorrections, type PassageCorrections } from "./corrections";
 import { hasQuranLabKey, QuranLabFailure, type QuranLabError } from "./quranlab";
 import { inferRecording, type RawObservation } from "./quranlab-inference";
+import { transcribeRecording } from "./transcriber";
+import { diffToEvidence, diffTranscript } from "./word-diff";
 
 export interface WordMistake {
   ayahKey: string;
@@ -58,20 +61,56 @@ export const notConnectedProvider: RecitationAssessmentProvider = {
 };
 
 export function getAssessmentProvider(): RecitationAssessmentProvider {
-  return tajweedFormerProvider;
+  return wordDiffProvider;
 }
+
+/**
+ * Quran speech-to-text, then a word-level comparison with the reference passage.
+ * Finds missing, extra and wrong words. It does not judge tajweed rules.
+ */
+export const wordDiffProvider: RecitationAssessmentProvider = {
+  id: "quran-asr-word-diff",
+  label: "Quran speech-to-text word comparison",
+  isConfigured: true,
+  async assess({ audio, expected, signal }) {
+    const providerId = "quran-asr-word-diff";
+    if (!audio) return { status: "no_recording", providerId };
+    const first = expected[0];
+    if (!first) return { status: "error", providerId, message: "empty_passage" };
+    try {
+      const transcript = await transcribeRecording(audio, signal);
+      const promptWords = buildPromptExcerpt(first).words.split(/\s+/u).filter(Boolean).length;
+      const diff = diffTranscript(expected, transcript, promptWords);
+      const { evidence, mistakes } = diffToEvidence(expected, diff);
+      return {
+        status: "completed",
+        providerId,
+        transcript,
+        mistakes,
+        corrections: mapAlignedCorrections(expected, evidence),
+      };
+    } catch (error) {
+      const reason = error instanceof QuranLabFailure ? error.reason : "inference";
+      const message = error instanceof Error && error.message ? error.message : reason;
+      return { status: "error", providerId, message, reason };
+    }
+  },
+};
 
 /** Real SDK inference; intentionally does not populate the completed correction contract. */
 export const tajweedFormerProvider: RecitationAssessmentProvider = {
   id: "tajweedformer-v4",
   label: "TajweedFormer V4",
-  get isConfigured() { return hasQuranLabKey(); },
+  get isConfigured() {
+    return hasQuranLabKey();
+  },
   async assess({ audio, signal }) {
     const providerId = "tajweedformer-v4";
     if (!audio) return { status: "no_recording", providerId };
     if (!hasQuranLabKey()) return { status: "setup_needed", providerId };
-    try { return { status: "observed", providerId, observation: await inferRecording(audio, signal) }; }
-    catch (error) {
+    try {
+      return { status: "observed", providerId, observation: await inferRecording(audio, signal) };
+    } catch (error) {
       const reason = error instanceof QuranLabFailure ? error.reason : "inference";
       return { status: "error", providerId, message: reason, reason };
     }
