@@ -90,9 +90,10 @@ export const wordDiffProvider: RecitationAssessmentProvider = {
         corrections: mapAlignedCorrections(expected, evidence),
       };
     } catch (error) {
+      console.error("[quran-asr-word-diff] failed", error);
       const reason = error instanceof QuranLabFailure ? error.reason : "inference";
-      const message = error instanceof Error && error.message ? error.message : reason;
-      return { status: "error", providerId, message, reason };
+      const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+      return { status: "error", providerId, message: detail.slice(0, 300), reason };
     }
   },
 };

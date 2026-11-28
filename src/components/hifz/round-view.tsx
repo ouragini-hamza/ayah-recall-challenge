@@ -122,7 +122,7 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
       {!submitted && (
         <>
           {continuous ? (
-            <><RecorderPanel recorder={recorder} locked={submitting} /><QuranLabStatus /></>
+            <RecorderPanel recorder={recorder} locked={submitting} />
           ) : (
             <div className="rounded-2xl border border-border bg-card p-5 text-sm text-muted-foreground shadow-soft">
               {t.setup.modePromptOnlyHint}
@@ -165,7 +165,18 @@ export function RoundView({ session, onFinishSession }: RoundViewProps) {
               </span>
             </div>
             {round.assessment?.status === "setup_needed" && <div className="mt-3"><QuranLabStatus reason="missing_key" /></div>}
-            {round.assessment?.status === "error" && <div className="mt-3"><QuranLabStatus reason={round.assessment.reason ?? "inference"} /></div>}
+            {round.assessment?.status === "error" && (
+              <div className="mt-3 grid gap-2">
+                {round.assessment.providerId === "quran-asr-word-diff" ? (
+                  <>
+                    <p role="status" className="text-sm text-muted-foreground">Speech recognition could not finish. Your recording and manual assessment are still available.</p>
+                    <p className="break-words rounded-md border border-border bg-muted px-3 py-2 font-mono text-xs text-foreground" dir="ltr">{round.assessment.message}</p>
+                  </>
+                ) : (
+                  <QuranLabStatus reason={round.assessment.reason ?? "inference"} />
+                )}
+              </div>
+            )}
             {round.assessment?.status === "observed" && <ModelObservations observation={round.assessment.observation} />}
             {recorder.audioUrl && (
               <div className="mt-5 grid gap-2">
